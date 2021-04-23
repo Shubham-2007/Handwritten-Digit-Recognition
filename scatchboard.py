@@ -1,7 +1,6 @@
 from keras.models import load_model
 from tkinter import *
 import tkinter as tk
-import win32gui
 from PIL import ImageGrab, Image
 import numpy as np
 from PIL import ImageDraw
@@ -41,17 +40,11 @@ class App(tk.Tk):
       self.draw = ImageDraw.Draw(self.image1)
       #creating elements
       self.Canvas=tk.Canvas(self,width=500,height=500,bg="white",cursor="cross")
-      self.label=tk.Label(self,text="Thinking..",font=("Helvetica",48))
       self.classify_btn=tk.Button(self,text="recognise",command=self.classify_handwriting)
       self.button_clear=tk.Button(self,text="Clear",command=self.clear_all)
-
-      #Grid Structure 
-      self.Canvas.grid(row=0,column=0,pady=2)
-      self.label.grid(row=0,column=1,pady=2,padx=2)
-      self.button_clear.grid(row=1,column=0,pady=2,padx=2)
-      self.classify_btn.grid(row=1,column=1,pady=2)
-      
-      #self.Canvas.bind("<Motion>",self.start_pos)
+      self.Canvas.grid(row=0,column=0,columnspan=2)
+      self.button_clear.grid(row=1,column=0)
+      self.classify_btn.grid(row=1,column=1)
       self.Canvas.bind("<B1-Motion>",self.draw_lines)
 
     def clear_all(self):
@@ -74,7 +67,7 @@ class App(tk.Tk):
         img = np.array(self.image1)
         # convert the image into grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # apply otsu thresholding
+        # apply thresholding
         ret, th = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV, cv2.THRESH_OTSU)
         # find the contours
         contours = cv2.findContours(th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
@@ -91,7 +84,7 @@ class App(tk.Tk):
             # Extract the image's region of interest
             roi = th[y - top:y + h + bottom, x - left:x + w + right] 
             digit,acc=predict_digit(roi)
-            self.label.configure(text=str(digit)+', '+str(int(acc*100))+'%')
+            print(digit)
             cv2.destroyAllWindows()
 
     def draw_lines(self,event):
